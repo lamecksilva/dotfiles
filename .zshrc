@@ -86,5 +86,3 @@ export PATH="$HOME/.jbang/bin:$PATH"
 alias python="python3"
 alias pip="pip3.13"
 alias ls="colorls"
-
-XDG_CONFIG_HOME=./dotfiles/nvim
