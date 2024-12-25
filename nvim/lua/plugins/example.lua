@@ -95,11 +95,6 @@ return {
       servers = {
         -- tsserver will be automatically installed with mason and loaded with lspconfig
         tsserver = {},
-        gopls = {
-          on_attach = function(client, _)
-            client.server_capabilities.documentHighlightProvider = false
-          end,
-        },
       },
       -- you can do any additional lsp server setup here
       -- return true if you don't want this server to be setup with lspconfig
