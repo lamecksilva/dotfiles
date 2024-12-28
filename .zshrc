@@ -86,3 +86,4 @@ export PATH="$HOME/.jbang/bin:$PATH"
 alias python="python3"
 alias pip="pip3.13"
 alias ls="colorls"
+export PATH=$PATH:$HOME/go/bin
