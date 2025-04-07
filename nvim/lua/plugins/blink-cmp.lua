@@ -77,16 +77,21 @@ return {
       },
       menu = {
         auto_show = true,
-        border = "single",
+        border = "rounded",
         draw = {
+          columns = {
+            { "kind_icon", "label", gap = 1 },
+            { "kind" },
+          },
           treesitter = { "lsp" },
         },
       },
       documentation = {
         auto_show = true,
-        auto_show_delay_ms = 200,
+        auto_show_delay_ms = 250,
+        treesitter_highlighting = true,
         window = {
-          border = "single",
+          border = "rounded",
         },
       },
       ghost_text = {
@@ -105,24 +110,33 @@ return {
     },
 
     -- experimental signature help support
-    -- signature = { enabled = true },
+    signature = {
+      enabled = true,
+      window = {
+        border = "rounded",
+      },
+    },
 
     sources = {
       -- adding any nvim-cmp sources here will enable them
       -- with blink.compat
       compat = {},
       default = { "lsp", "path", "snippets", "buffer" },
-      -- providers = {
-      --   lsp = {
-      --     override = {
-      --       get_trigger_characters = function(self)
-      --         local trigger_characters = self:get_trigger_characters()
-      --         vim.list_extend(trigger_characters, { "\n", "\t", " " })
-      --         return trigger_characters
-      --       end,
-      --     },
-      --   },
-      -- },
+      providers = {
+        lsp = {
+          min_keyword_length = 1, -- Number of characters to trigger porvider
+          score_offset = 0, -- Boost/penalize the score of the items
+        },
+        path = {
+          min_keyword_length = 0,
+        },
+        snippets = {
+          min_keyword_length = 1,
+        },
+        buffer = {
+          min_keyword_length = 1,
+        },
+      },
     },
 
     cmdline = {
@@ -132,6 +146,7 @@ return {
     keymap = {
       preset = "enter",
       ["<C-y>"] = { "select_and_accept" },
+      ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
     },
   },
   ---@param opts blink.cmp.Config | { sources: { compat: string[] } }
