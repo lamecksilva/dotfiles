@@ -11,4 +11,6 @@ return {
       },
     },
   },
+
+  { "ellisonleao/gruvbox.nvim" },
 }
