@@ -117,28 +117,6 @@ return {
       },
     },
 
-    sources = {
-      -- adding any nvim-cmp sources here will enable them
-      -- with blink.compat
-      compat = {},
-      default = { "lsp", "path", "snippets", "buffer" },
-      providers = {
-        lsp = {
-          min_keyword_length = 1, -- Number of characters to trigger porvider
-          score_offset = 0, -- Boost/penalize the score of the items
-        },
-        path = {
-          min_keyword_length = 0,
-        },
-        snippets = {
-          min_keyword_length = 1,
-        },
-        buffer = {
-          min_keyword_length = 1,
-        },
-      },
-    },
-
     cmdline = {
       enabled = false,
     },
