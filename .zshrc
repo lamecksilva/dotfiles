@@ -45,6 +45,7 @@ zsh-syntax-highlighting
 you-should-use 
 zsh-bat
 fancy-ctrl-z
+docker
 )
 
 source $ZSH/oh-my-zsh.sh
@@ -87,3 +88,5 @@ alias python="python3"
 alias pip="pip3.13"
 alias ls="colorls"
 export PATH=$PATH:$HOME/go/bin
+
+alias g_casar="GIT_SSH_COMMAND='ssh -i ~/.ssh/id_rsa_casar'"
