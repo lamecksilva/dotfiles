@@ -1,0 +1,83 @@
+#!/bin/bash
+
+# Variável global para a chave SSH a ser usada
+SSH_KEY_PATH=""
+
+# Funções
+select_ssh_key() {
+  echo ""
+  echo "Select SSH key:"
+  echo "1) github @lamecksilva (~/.ssh/id_ed25519)"
+  echo "2) github @lamecksilvacasar (~/.ssh/id_rsa_casar)"
+  read -p "Option: " ssh_opt
+
+  case $ssh_opt in
+  1) SSH_KEY_PATH="$HOME/.ssh/id_ed25519" ;;
+  2) SSH_KEY_PATH="$HOME/.ssh/id_rsa_casar" ;;
+  *) echo "Invalid option" ;;
+  esac
+}
+
+git_add() {
+  echo "-> Adding files..."
+  git add .
+}
+
+git_commit() {
+  read -p "Write commit message: " commit_msg
+  git commit -m "$commit_msg"
+}
+
+git_push() {
+  select_ssh_key
+  echo "-> Pushing with key: $SSH_KEY_PATH"
+  if [ -n "$SSH_KEY_PATH" ]; then
+    GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git push
+  else
+    git push
+  fi
+}
+
+git_pull() {
+  select_ssh_key
+  echo "-> Pulling with key: $SSH_KEY_PATH"
+  if [ -n "$SSH_KEY_PATH" ]; then
+    GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git pull
+  else
+    git pull
+  fi
+}
+
+# Menu
+while true; do
+  echo ""
+  echo "========== MENU GIT =========="
+  echo "1) git add ."
+  echo "2) git commit -m"
+  echo "3) git push"
+  echo "4) git pull"
+  echo "5) add + commit + push"
+  echo "6) Select SSH key "
+  echo "7) Cancel"
+  echo "=============================="
+  read -p "Select option: " opt
+
+  clear
+  case $opt in
+  1) git_add ;;
+  2) git_commit ;;
+  3) git_push ;;
+  4) git_pull ;;
+  5)
+    git_add
+    git_commit
+    git_push
+    ;;
+  6) select_ssh_key ;;
+  7)
+    echo "Exiting..."
+    break
+    ;;
+  *) echo "Invalid option!" ;;
+  esac
+done
