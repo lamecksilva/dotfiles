@@ -88,5 +88,7 @@ alias python="python3"
 alias pip="pip3.13"
 alias ls="colorls"
 export PATH=$PATH:$HOME/go/bin
+export PATH=$PATH:$HOME/dotfiles/scripts
 
 alias g_casar="GIT_SSH_COMMAND='ssh -i ~/.ssh/id_rsa_casar'"
+

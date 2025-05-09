@@ -62,7 +62,6 @@ while true; do
   echo "=============================="
   read -p "Select option: " opt
 
-  clear
   case $opt in
   1) git_add ;;
   2) git_commit ;;
