@@ -92,3 +92,4 @@ export PATH=$PATH:$HOME/dotfiles/scripts
 
 alias g_casar="GIT_SSH_COMMAND='ssh -i ~/.ssh/id_rsa_casar'"
 
+
