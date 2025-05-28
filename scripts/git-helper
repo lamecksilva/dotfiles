@@ -12,6 +12,19 @@ INFO="ℹ️ "
 CHECK="✅"
 ERROR="❌"
 
+print_logs=()
+
+add_message() {
+  print_logs[${#print_logs[@]}]=$1
+}
+
+print_messages() {
+  clear
+  for element in "${print_logs[@]}"; do
+    echo "$element"
+  done
+}
+
 # Funções
 select_ssh_key() {
   echo -e "\n${INFO}Select SSH key:"
@@ -36,17 +49,18 @@ select_ssh_key() {
       ;;
     esac
   done
-  echo -e "${CHECK} SSH key selected: $SSH_KEY_PATH"
+
+  add_message "${CHECK} SSH key selected: $SSH_KEY_PATH"
 }
 
 show_selected_key() {
-  echo -e "\n${INFO}Current SSH key: ${YELLOW}${SSH_KEY_PATH}${NC}"
+  add_message "\n${INFO}Current SSH key: ${YELLOW}${SSH_KEY_PATH}${NC}"
 }
 
 git_add() {
-  echo -e "${INFO}Adding files..."
+  add_message "${INFO}Adding files..."
   git add .
-  echo -e "${CHECK} Files added."
+  add_message "${CHECK} Files added."
 }
 
 git_commit() {
@@ -55,22 +69,23 @@ git_commit() {
 }
 
 git_fetch() {
-  echo -e "${INFO}Fetching with key: $SSH_KEY_PATH"
+  add_message "${INFO}Fetching with key: $SSH_KEY_PATH"
   GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git fetch
 }
 
 git_push() {
-  echo -e "${INFO}Pushing with key: $SSH_KEY_PATH"
+  add_message "${INFO}Pushing with key: $SSH_KEY_PATH"
   GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git push
 }
 
 git_pull() {
-  echo -e "${INFO}Pulling with key: $SSH_KEY_PATH"
+  add_message "${INFO}Pulling with key: $SSH_KEY_PATH"
   GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git pull
 }
 
-# Menu interativo
 while true; do
+  print_messages
+
   echo -e "\n${YELLOW}=============================${NC}"
   echo -e "${GREEN}  Git Helper Menu${NC}"
   echo -e "${YELLOW}=============================${NC}"
