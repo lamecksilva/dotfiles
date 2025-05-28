@@ -15,11 +15,14 @@ ERROR="❌"
 print_logs=()
 
 add_message() {
+  if [ "$2" = true ]; then
+    clear
+  fi
+
   print_logs[${#print_logs[@]}]=$1
 }
 
 print_messages() {
-  clear
   for element in "${print_logs[@]}"; do
     echo "$element"
   done
@@ -50,11 +53,11 @@ select_ssh_key() {
     esac
   done
 
-  add_message "${CHECK} SSH key selected: $SSH_KEY_PATH"
+  add_message "${CHECK} SSH key selected: $SSH_KEY_PATH" true
 }
 
 show_selected_key() {
-  add_message "\n${INFO}Current SSH key: ${YELLOW}${SSH_KEY_PATH}${NC}"
+  add_message "\n${INFO}Current SSH key: ${YELLOW}${SSH_KEY_PATH}${NC}" true
 }
 
 git_add() {
