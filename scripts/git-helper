@@ -77,7 +77,7 @@ git_fetch() {
 }
 
 git_push() {
-  add_message "${INFO}Pushing with key: $SSH_KEY_PATH"
+  add_message "${INFO}Pushing with key: $SSH_KEY_PATH" false
   GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git push
 }
 
