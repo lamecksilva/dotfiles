@@ -15,9 +15,9 @@ ERROR="❌"
 print_logs=()
 
 add_message() {
-  if [ "$2" = true ]; then
-    clear
-  fi
+  # if [ "$2" = true ]; then
+  #   # clear
+  # fi
 
   print_logs[${#print_logs[@]}]=$1
 }
@@ -78,7 +78,8 @@ git_fetch() {
 
 git_push() {
   add_message "${INFO}Pushing with key: $SSH_KEY_PATH" false
-  GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git push
+  BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+  GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git push --set-upstream origin "$BRANCH_NAME"
 }
 
 git_pull() {
