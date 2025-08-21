@@ -41,14 +41,13 @@ HIST_STAMPS="dd/mm/yyyy"
 plugins=(
 git 
 zsh-autosuggestions 
-zsh-syntax-highlighting 
-you-should-use 
-zsh-bat
 fancy-ctrl-z
 docker
 )
 
 source $ZSH/oh-my-zsh.sh
+
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
 
 # User configuration
 
@@ -86,7 +85,7 @@ export PATH="$HOME/.jbang/bin:$PATH"
 # python configs
 alias python="python3"
 alias pip="pip3.13"
-alias ls="colorls"
+# alias ls="colorls"
 export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:$HOME/dotfiles/scripts
 
