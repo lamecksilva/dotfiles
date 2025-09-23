@@ -40,6 +40,7 @@ show_header() {
     clear
     echo -e "${BLUE}╔══════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║${GREEN}            Git Helper v2.0          ${BLUE}║${NC}"
+    echo -e "${BLUE}║${YELLOW}              by Lameck              ${BLUE}║${NC}"
     echo -e "${BLUE}╚══════════════════════════════════════╝${NC}"
     echo -e "${INFO} Current key: ${YELLOW}$(basename "$SSH_KEY_PATH")${NC}"
     echo -e "${INFO} Repository: ${YELLOW}$(git remote get-url origin 2>/dev/null || 'Not a git repo')${NC}"
