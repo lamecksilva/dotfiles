@@ -1,127 +1,164 @@
 #!/bin/bash
 
-SSH_KEY_PATH="$HOME/.ssh/id_ed25519"
+# Auto-detect SSH keys
+detect_ssh_keys() {
+    local keys=()
+    for key in ~/.ssh/id_*; do
+        [[ -f "$key" && ! "$key" =~ \.pub$ ]] && keys+=("$key")
+    done
+    echo "${keys[@]}"
+}
 
-# Cores
+SSH_KEYS=($(detect_ssh_keys))
+SSH_KEY_PATH="${SSH_KEYS[0]:-$HOME/.ssh/id_ed25519}"
+
+# Colors
 GREEN="\033[0;32m"
 YELLOW="\033[1;33m"
+BLUE="\033[0;34m"
+RED="\033[0;31m"
 NC="\033[0m"
 
-# Emojis
-INFO="ℹ️ "
+# Icons
+INFO="ℹ️"
 CHECK="✅"
 ERROR="❌"
+ROCKET="🚀"
 
-print_logs=()
+logs=()
 
-add_message() {
-  if [ "$2" = true ]; then
+log() {
+    local msg="$1"
+    local clear_screen="${2:-false}"
+    
+    [[ "$clear_screen" == "true" ]] && clear
+    logs+=("$msg")
+    echo -e "$msg"
+}
+
+show_header() {
     clear
-  fi
-
-  print_logs[${#print_logs[@]}]=$1
+    echo -e "${BLUE}╔══════════════════════════════════════╗${NC}"
+    echo -e "${BLUE}║${GREEN}            Git Helper v2.0          ${BLUE}║${NC}"
+    echo -e "${BLUE}╚══════════════════════════════════════╝${NC}"
+    echo -e "${INFO} Current key: ${YELLOW}$(basename "$SSH_KEY_PATH")${NC}"
+    echo -e "${INFO} Repository: ${YELLOW}$(git remote get-url origin 2>/dev/null || 'Not a git repo')${NC}"
+    echo ""
 }
 
-print_messages() {
-  for element in "${print_logs[@]}"; do
-    echo "$element"
-  done
-}
-
-# Funções
 select_ssh_key() {
-  echo -e "\n${INFO}Select SSH key:"
-  options=("github @lamecksilva (~/.ssh/id_ed25519)" "github @lamecksilvacasar (~/.ssh/id_rsa_casar)" "Cancel")
-  select opt in "${options[@]}"; do
-    case $REPLY in
-    1)
-      SSH_KEY_PATH="$HOME/.ssh/id_ed25519"
-      break
-      ;;
-    2)
-      SSH_KEY_PATH="$HOME/.ssh/id_rsa_casar"
-      break
-      ;;
-    3)
-      echo -e "${INFO}Canceled."
-      return
-      ;;
-    *)
-      echo -e "${ERROR}Invalid option."
-      continue
-      ;;
-    esac
-  done
-
-  add_message "${CHECK} SSH key selected: $SSH_KEY_PATH" true
+    if [[ ${#SSH_KEYS[@]} -eq 0 ]]; then
+        log "${ERROR} No SSH keys found in ~/.ssh/"
+        return 1
+    fi
+    
+    echo -e "${INFO} Available SSH keys:"
+    for i in "${!SSH_KEYS[@]}"; do
+        echo "  $((i+1))) $(basename "${SSH_KEYS[i]}")"
+    done
+    echo "  $((${#SSH_KEYS[@]}+1))) Cancel"
+    
+    read -p "Select key [1-$((${#SSH_KEYS[@]}+1))]: " choice
+    
+    if [[ "$choice" -ge 1 && "$choice" -le ${#SSH_KEYS[@]} ]]; then
+        SSH_KEY_PATH="${SSH_KEYS[$((choice-1))]}"
+        log "${CHECK} Key selected: $(basename "$SSH_KEY_PATH")"
+    elif [[ "$choice" -eq $((${#SSH_KEYS[@]}+1)) ]]; then
+        log "${INFO} Cancelled"
+    else
+        log "${ERROR} Invalid selection"
+    fi
 }
 
-show_selected_key() {
-  add_message "\n${INFO}Current SSH key: ${YELLOW}${SSH_KEY_PATH}${NC}" true
+git_status() {
+    log "${INFO} Git status:"
+    git status --short
 }
 
 git_add() {
-  add_message "${INFO}Adding files..."
-  git add .
-  add_message "${CHECK} Files added."
+    log "${INFO} Adding files..."
+    if git add . 2>&1; then
+        log "${CHECK} Files staged"
+        git_status
+    else
+        log "${ERROR} Failed to add files"
+    fi
 }
 
 git_commit() {
-  read -p "${INFO}Write commit message: " commit_msg
-  git commit -m "$commit_msg" && echo -e "${CHECK} Commit done."
+    read -p "${INFO} Commit message: " commit_msg
+    [[ -z "$commit_msg" ]] && { log "${ERROR} Empty commit message"; return 1; }
+    
+    if git commit -m "$commit_msg"; then
+        log "${CHECK} Committed: $commit_msg"
+    else
+        log "${ERROR} Commit failed"
+    fi
 }
 
-git_fetch() {
-  add_message "${INFO}Fetching with key: $SSH_KEY_PATH"
-  GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git fetch
+git_operation() {
+    local operation="$1"
+    local key_flag="GIT_SSH_COMMAND=ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes"
+    
+    log "${INFO} Running git $operation..."
+    
+    if eval "$key_flag git $operation"; then
+        log "${CHECK} git $operation completed"
+    else
+        log "${ERROR} git $operation failed"
+        return 1
+    fi
 }
 
-git_push() {
-  add_message "${INFO}Pushing with key: $SSH_KEY_PATH" false
-  GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git push
+show_menu() {
+    echo -e "${YELLOW}Commands:${NC}"
+    echo -e "  ${GREEN}a${NC})  git add ."
+    echo -e "  ${GREEN}c${NC})  git commit"
+    echo -e "  ${GREEN}s${NC})  git status"
+    echo -e "  ${GREEN}f${NC})  git fetch"
+    echo -e "  ${GREEN}p${NC})  git push"
+    echo -e "  ${GREEN}pl${NC}) git pull"
+    echo -e "  ${GREEN}acp${NC}) add → commit → push"
+    echo -e "  ${GREEN}k${NC})  select SSH key"
+    echo -e "  ${GREEN}l${NC})  show logs"
+    echo -e "  ${GREEN}q${NC})  quit"
+    echo ""
 }
 
-git_pull() {
-  add_message "${INFO}Pulling with key: $SSH_KEY_PATH"
-  GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git pull
+show_logs() {
+    echo -e "${INFO} Recent operations:"
+    for log_entry in "${logs[@]: -10}"; do
+        echo "  $log_entry"
+    done
 }
 
+# Main loop
 while true; do
-  print_messages
-
-  echo -e "\n${YELLOW}=============================${NC}"
-  echo -e "${GREEN}  Git Helper Menu${NC}"
-  echo -e "${YELLOW}=============================${NC}"
-  echo " [a]   git add ."
-  echo " [c]   git commit -m"
-  echo " [f]   git fetch"
-  echo " [p]   git push"
-  echo " [pl]  git pull"
-  echo " [acp] add + commit + push"
-  echo " [k]   Select SSH key"
-  echo " [s]   Show selected SSH key"
-  echo " [q]   Quit"
-  echo ""
-
-  read -p "Select option: " opt
-
-  case $opt in
-  "a") git_add ;;
-  "c") git_commit ;;
-  "f") git_fetch ;;
-  "p") git_push ;;
-  "pl") git_pull ;;
-  "acp")
-    git_add
-    git_commit
-    git_push
-    ;;
-  "k") select_ssh_key ;;
-  "s") show_selected_key ;;
-  "q" | "")
-    echo -e "${INFO}Goodbye!"
-    break
-    ;;
-  *) echo -e "${ERROR}Invalid option!" ;;
-  esac
+    show_header
+    show_menu
+    
+    read -p "${ROCKET} Choose option: " opt
+    echo ""
+    
+    case "$opt" in
+        "a") git_add ;;
+        "c") git_commit ;;
+        "s") git_status ;;
+        "f") git_operation "fetch" ;;
+        "p") git_operation "push" ;;
+        "pl") git_operation "pull" ;;
+        "acp")
+            git_add && git_commit && git_operation "push"
+            ;;
+        "k") select_ssh_key ;;
+        "l") show_logs ;;
+        "q"|"") 
+            log "${INFO} Goodbye!"
+            break
+            ;;
+        *) log "${ERROR} Invalid option: $opt" ;;
+    esac
+    
+    echo ""
+    read -p "Press Enter to continue..."
 done
