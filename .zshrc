@@ -1,3 +1,5 @@
+# Amazon Q pre block. Keep at the top of this file.
+[[ -f "${HOME}/.local/share/amazon-q/shell/zshrc.pre.zsh" ]] && builtin source "${HOME}/.local/share/amazon-q/shell/zshrc.pre.zsh"
 # Enable Powerlevel10k instant prompt. Should stay close to the top of ~/.zshrc.
 # Initialization code that may require console input (password prompts, [y/n]
 # confirmations, etc.) must go above this block; everything else may go below.
@@ -43,7 +45,6 @@ git
 zsh-autosuggestions 
 zsh-syntax-highlighting 
 you-should-use 
-zsh-bat
 fancy-ctrl-z
 docker
 )
@@ -86,7 +87,7 @@ export PATH="$HOME/.jbang/bin:$PATH"
 # python configs
 alias python="python3"
 alias pip="pip3.13"
-alias ls="colorls"
+# alias ls="colorls"
 export PATH=$PATH:$HOME/go/bin
 export PATH=$PATH:$HOME/dotfiles/scripts
 
@@ -94,3 +95,5 @@ alias g_casar="GIT_SSH_COMMAND='ssh -i ~/.ssh/id_rsa_casar'"
 
 alias ghp="git-helper"
 
+# Amazon Q post block. Keep at the bottom of this file.
+[[ -f "${HOME}/.local/share/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/amazon-q/shell/zshrc.post.zsh"
