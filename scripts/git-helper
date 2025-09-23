@@ -98,11 +98,10 @@ git_commit() {
 
 git_operation() {
     local operation="$1"
-    local key_flag="GIT_SSH_COMMAND=ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes"
     
     log "${INFO} Running git $operation..."
     
-    if eval "$key_flag git $operation"; then
+    if GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git $operation; then
         log "${CHECK} git $operation completed"
     else
         log "${ERROR} git $operation failed"
