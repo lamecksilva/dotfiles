@@ -102,11 +102,21 @@ git_operation() {
     
     log "${INFO} Running git $operation..."
     
-    if GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git $operation; then
-        log "${CHECK} git $operation completed"
+    if [[ "$operation" == "push" ]]; then
+        local current_branch=$(git branch --show-current)
+        if GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git push --set-upstream origin "$current_branch"; then
+            log "${CHECK} git $operation completed with upstream set"
+        else
+            log "${ERROR} git $operation failed"
+            return 1
+        fi
     else
-        log "${ERROR} git $operation failed"
-        return 1
+        if GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git $operation; then
+            log "${CHECK} git $operation completed"
+        else
+            log "${ERROR} git $operation failed"
+            return 1
+        fi
     fi
 }
 
