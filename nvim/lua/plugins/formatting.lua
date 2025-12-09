@@ -1,12 +1,3 @@
-return {
-  {
-    "stevearc/conform.nvim",
-    opts = {
-      formatters_by_ft = {
-        typescript = { "prettier" },
-        javascript = { "prettier" },
-        json = { "prettier" },
-      },
-    },
-  },
-}
+-- Formatação usando padrões LazyVim
+-- Go formatting será gerenciado pelo extra lang.go
+return {}

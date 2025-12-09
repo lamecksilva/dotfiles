@@ -4,7 +4,7 @@ return {
     name = "catppuccin",
     priority = 1000,
     opts = {
-      flavour = "mocha",
+      flavour = "latte",
       integrations = {
         treesitter = true,
         native_lsp = {
@@ -28,7 +28,7 @@ return {
   {
     "LazyVim/LazyVim",
     opts = {
-      colorscheme = "catppuccin-mocha",
+      colorscheme = "catppuccin-latte",
     },
   },
 }
