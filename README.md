@@ -11,6 +11,8 @@ To install the dotfiles, just run the install script with
 > if needed change the location of files locations,
 > fix the script for you and your system
 
+---
+
 ### Useful Bug fixes
 
 #### Compose key in Cinnamon
