@@ -1,10 +1,17 @@
-#### Dotfiles
+# Dotfiles
+
+My dotfiles configs, useful scripts and Neovim setup
+
+## Installation
 
 To install the dotfiles, just run the install script with
 
 `./script.sh`
 
-if needed change the location of files locations, fix the script for you and your system
+> if needed change the location of files locations,
+> fix the script for you and your system
+
+### Useful Bug fixes
 
 #### Compose key in Cinnamon
 
