@@ -19,6 +19,12 @@ return {
               updateImportsOnFileMove = { enabled = "always" },
               suggest = {
                 completeFunctionCalls = true,
+                includeCompletionsForModuleExports = true,
+                includeCompletionsForImportStatements = true,
+              },
+              preferences = {
+                includePackageJsonAutoImports = "auto",
+                importModuleSpecifier = "shortest",
               },
               inlayHints = {
                 enumMemberValues = { enabled = true },
