@@ -100,7 +100,7 @@ alias ghp="git-helper"
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
 
 # If "secrets" file exists (file with keys exported to shell like GITHUB_TOKEN), load file
-[[ -f "./secrets.zsh" ]] && source "./secrets.zsh"
+[[ -f ~/dotfiles/secrets.zsh ]] && source ~/dotfiles/secrets.zsh
 
 # Amazon Q post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/amazon-q/shell/zshrc.post.zsh"
