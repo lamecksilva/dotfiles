@@ -3,7 +3,7 @@ return {
     "saghen/blink.cmp",
     opts = {
       completion = {
-        accept = { auto_brackets = { enabled = true } },
+        accept = { auto_brackets = { enabled = false } },
         menu = {
           draw = {
             treesitter = { "lsp" },

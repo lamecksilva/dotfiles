@@ -25,6 +25,8 @@ return {
               preferences = {
                 includePackageJsonAutoImports = "auto",
                 importModuleSpecifier = "shortest",
+                -- Desabilitar inserção automática de espaços em brackets
+                insertSpaceAfterOpeningAndBeforeClosingNonemptyBraces = false,
               },
               inlayHints = {
                 enumMemberValues = { enabled = true },
