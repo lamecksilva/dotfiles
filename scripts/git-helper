@@ -2,11 +2,11 @@
 
 # Auto-detect SSH keys
 detect_ssh_keys() {
-    local keys=()
-    for key in ~/.ssh/id_*; do
-        [[ -f "$key" && ! "$key" =~ \.pub$ ]] && keys+=("$key")
-    done
-    echo "${keys[@]}"
+  local keys=()
+  for key in ~/.ssh/id_*; do
+    [[ -f "$key" && ! "$key" =~ \.pub$ ]] && keys+=("$key")
+  done
+  echo "${keys[@]}"
 }
 
 SSH_KEYS=($(detect_ssh_keys))
@@ -28,147 +28,150 @@ ROCKET="🚀"
 logs=()
 
 log() {
-    local msg="$1"
-    local clear_screen="${2:-false}"
-    
-    [[ "$clear_screen" == "true" ]] && clear
-    logs+=("$msg")
-    echo -e "$msg"
+  local msg="$1"
+  local clear_screen="${2:-false}"
+
+  [[ "$clear_screen" == "true" ]] && clear
+  logs+=("$msg")
+  echo -e "$msg"
 }
 
 show_header() {
-    clear
-    echo -e "${BLUE}╔══════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║${GREEN}            Git Helper v2.0          ${BLUE}║${NC}"
-    echo -e "${BLUE}║${YELLOW}              by Lameck              ${BLUE}║${NC}"
-    echo -e "${BLUE}╚══════════════════════════════════════╝${NC}"
-    echo -e "${INFO} Current key: ${YELLOW}$(basename "$SSH_KEY_PATH")${NC}"
-    echo -e "${INFO} Repository: ${YELLOW}$(git remote get-url origin 2>/dev/null || 'Not a git repo')${NC}"
-    echo ""
+  clear
+  echo -e "${BLUE}╔══════════════════════════════════════╗${NC}"
+  echo -e "${BLUE}║${GREEN}            Git Helper v2.0          ${BLUE}║${NC}"
+  echo -e "${BLUE}║${YELLOW}              by Lameck              ${BLUE}║${NC}"
+  echo -e "${BLUE}╚══════════════════════════════════════╝${NC}"
+  echo -e "${INFO} Current key: ${YELLOW}$(basename "$SSH_KEY_PATH")${NC}"
+  echo -e "${INFO} Repository: ${YELLOW}$(git remote get-url origin 2>/dev/null || 'Not a git repo')${NC}"
+  echo ""
 }
 
 select_ssh_key() {
-    if [[ ${#SSH_KEYS[@]} -eq 0 ]]; then
-        log "${ERROR} No SSH keys found in ~/.ssh/"
-        return 1
-    fi
-    
-    echo -e "${INFO} Available SSH keys:"
-    for i in "${!SSH_KEYS[@]}"; do
-        echo "  $((i+1))) $(basename "${SSH_KEYS[i]}")"
-    done
-    echo "  $((${#SSH_KEYS[@]}+1))) Cancel"
-    
-    read -p "Select key [1-$((${#SSH_KEYS[@]}+1))]: " choice
-    
-    if [[ "$choice" -ge 1 && "$choice" -le ${#SSH_KEYS[@]} ]]; then
-        SSH_KEY_PATH="${SSH_KEYS[$((choice-1))]}"
-        log "${CHECK} Key selected: $(basename "$SSH_KEY_PATH")"
-    elif [[ "$choice" -eq $((${#SSH_KEYS[@]}+1)) ]]; then
-        log "${INFO} Cancelled"
-    else
-        log "${ERROR} Invalid selection"
-    fi
+  if [[ ${#SSH_KEYS[@]} -eq 0 ]]; then
+    log "${ERROR} No SSH keys found in ~/.ssh/"
+    return 1
+  fi
+
+  echo -e "${INFO} Available SSH keys:"
+  for i in "${!SSH_KEYS[@]}"; do
+    echo "  $((i + 1))) $(basename "${SSH_KEYS[i]}")"
+  done
+  echo "  $((${#SSH_KEYS[@]} + 1))) Cancel"
+
+  read -p "Select key [1-$((${#SSH_KEYS[@]} + 1))]: " choice
+
+  if [[ "$choice" -ge 1 && "$choice" -le ${#SSH_KEYS[@]} ]]; then
+    SSH_KEY_PATH="${SSH_KEYS[$((choice - 1))]}"
+    log "${CHECK} Key selected: $(basename "$SSH_KEY_PATH")"
+  elif [[ "$choice" -eq $((${#SSH_KEYS[@]} + 1)) ]]; then
+    log "${INFO} Cancelled"
+  else
+    log "${ERROR} Invalid selection"
+  fi
 }
 
 git_status() {
-    log "${INFO} Git status:"
-    git status --short
+  log "${INFO} Git status:"
+  git status --short
 }
 
 git_add() {
-    log "${INFO} Adding files..."
-    if git add . 2>&1; then
-        log "${CHECK} Files staged"
-        git_status
-    else
-        log "${ERROR} Failed to add files"
-    fi
+  log "${INFO} Adding files..."
+  if git add . 2>&1; then
+    log "${CHECK} Files staged"
+    git_status
+  else
+    log "${ERROR} Failed to add files"
+  fi
 }
 
 git_commit() {
-    read -p "${INFO} Commit message: " commit_msg
-    [[ -z "$commit_msg" ]] && { log "${ERROR} Empty commit message"; return 1; }
-    
-    if git commit -m "$commit_msg"; then
-        log "${CHECK} Committed: $commit_msg"
-    else
-        log "${ERROR} Commit failed"
-    fi
+  read -p "${INFO} Commit message: " commit_msg
+  [[ -z "$commit_msg" ]] && {
+    log "${ERROR} Empty commit message"
+    return 1
+  }
+
+  if git commit -m "$commit_msg"; then
+    log "${CHECK} Committed: $commit_msg"
+  else
+    log "${ERROR} Commit failed"
+  fi
 }
 
 git_operation() {
-    local operation="$1"
-    
-    log "${INFO} Running git $operation..."
-    
-    if [[ "$operation" == "push" ]]; then
-        local current_branch=$(git branch --show-current)
-        if GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git push --set-upstream origin "$current_branch"; then
-            log "${CHECK} git $operation completed with upstream set"
-        else
-            log "${ERROR} git $operation failed"
-            return 1
-        fi
+  local operation="$1"
+
+  log "${INFO} Running git $operation..."
+
+  if [[ "$operation" == "push" ]]; then
+    local current_branch=$(git branch --show-current)
+    if GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git push --set-upstream origin "$current_branch"; then
+      log "${CHECK} git $operation completed with upstream set"
     else
-        if GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git $operation; then
-            log "${CHECK} git $operation completed"
-        else
-            log "${ERROR} git $operation failed"
-            return 1
-        fi
+      log "${ERROR} git $operation failed"
+      return 1
     fi
+  else
+    if GIT_SSH_COMMAND="ssh -i $SSH_KEY_PATH -o IdentitiesOnly=yes" git $operation; then
+      log "${CHECK} git $operation completed"
+    else
+      log "${ERROR} git $operation failed"
+      return 1
+    fi
+  fi
 }
 
 show_menu() {
-    echo -e "${YELLOW}Commands:${NC}"
-    echo -e "  ${GREEN}a${NC})  git add ."
-    echo -e "  ${GREEN}c${NC})  git commit"
-    echo -e "  ${GREEN}s${NC})  git status"
-    echo -e "  ${GREEN}f${NC})  git fetch"
-    echo -e "  ${GREEN}p${NC})  git push"
-    echo -e "  ${GREEN}pl${NC}) git pull"
-    echo -e "  ${GREEN}acp${NC}) add → commit → push"
-    echo -e "  ${GREEN}k${NC})  select SSH key"
-    echo -e "  ${GREEN}l${NC})  show logs"
-    echo -e "  ${GREEN}q${NC})  quit"
-    echo ""
+  echo -e "${YELLOW}Commands:${NC}"
+  echo -e "  ${GREEN}a${NC})  git add ."
+  echo -e "  ${GREEN}c${NC})  git commit"
+  echo -e "  ${GREEN}s${NC})  git status"
+  echo -e "  ${GREEN}f${NC})  git fetch"
+  echo -e "  ${GREEN}p${NC})  git push"
+  echo -e "  ${GREEN}pl${NC}) git pull"
+  echo -e "  ${GREEN}acp${NC}) add → commit → push"
+  echo -e "  ${GREEN}k${NC})  select SSH key"
+  echo -e "  ${GREEN}l${NC})  show logs"
+  echo -e "  ${GREEN}q${NC})  quit"
+  echo ""
 }
 
 show_logs() {
-    echo -e "${INFO} Recent operations:"
-    for log_entry in "${logs[@]: -10}"; do
-        echo "  $log_entry"
-    done
+  echo -e "${INFO} Recent operations:"
+  for log_entry in "${logs[@]: -10}"; do
+    echo "  $log_entry"
+  done
 }
 
 # Main loop
 while true; do
-    show_header
-    show_menu
-    
-    read -p "${ROCKET} Choose option: " opt
-    echo ""
-    
-    case "$opt" in
-        "a") git_add ;;
-        "c") git_commit ;;
-        "s") git_status ;;
-        "f") git_operation "fetch" ;;
-        "p") git_operation "push" ;;
-        "pl") git_operation "pull" ;;
-        "acp")
-            git_add && git_commit && git_operation "push"
-            ;;
-        "k") select_ssh_key ;;
-        "l") show_logs ;;
-        "q"|"") 
-            log "${INFO} Goodbye!"
-            break
-            ;;
-        *) log "${ERROR} Invalid option: $opt" ;;
-    esac
-    
-    echo ""
-    read -p "Press Enter to continue..."
+  show_header
+  show_menu
+
+  read -p "${ROCKET} Choose option: " opt
+  echo ""
+
+  case "$opt" in
+  "a") git_add ;;
+  "c") git_commit ;;
+  "s") git_status ;;
+  "f") git_operation "fetch" ;;
+  "p") git_operation "push" ;;
+  "pl") git_operation "pull" ;;
+  "acp")
+    git_add && git_commit && git_operation "push"
+    ;;
+  "k") select_ssh_key ;;
+  "l") show_logs ;;
+  "q" | "")
+    log "${INFO} Goodbye!"
+    break
+    ;;
+  *) log "${ERROR} Invalid option: $opt" ;;
+  esac
+
+  echo ""
+  read -p "Press Enter to continue..."
 done
