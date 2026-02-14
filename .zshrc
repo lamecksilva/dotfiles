@@ -111,3 +111,5 @@ export NVM_DIR="$HOME/.nvm"
 
 # Amazon Q post block. Keep at the bottom of this file.
 [[ -f "${HOME}/.local/share/amazon-q/shell/zshrc.post.zsh" ]] && builtin source "${HOME}/.local/share/amazon-q/shell/zshrc.post.zsh"
+
+source /usr/share/nvm/init-nvm.sh
