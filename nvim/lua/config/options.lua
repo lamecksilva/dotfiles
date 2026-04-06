@@ -3,3 +3,4 @@
 -- Add any additional options here
 vim.opt.autoread = true
 vim.g.deprecation_warnings = true
+vim.wo.relativenumber = false
