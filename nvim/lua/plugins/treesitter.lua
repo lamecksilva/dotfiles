@@ -19,6 +19,8 @@ return {
         "yaml",
         "go",
       })
+      opts.highlight = { enable = true }
+      opts.indent = { enable = true }
     end,
   },
 }
